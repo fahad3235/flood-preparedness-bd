@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flood Preparedness BD — বন্যা প্রস্তুতি বিডি</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="header-inner">
+    <div>
+      <h1 data-i18n="appTitle">Flood Preparedness BD</h1>
+      <p class="subtitle" data-i18n="appSubtitle">Get your family ready before the water comes — offline guide for Bangladesh</p>
+    </div>
+    <button id="langBtn" class="btn lang" type="button">বাংলা</button>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <button class="tab-btn active" data-tab="calc" type="button" data-i18n="tabCalc">Water &amp; Food</button>
+  <button class="tab-btn" data-tab="bag" type="button" data-i18n="tabBag">Go-Bag</button>
+  <button class="tab-btn" data-tab="quiz" type="button" data-i18n="tabQuiz">Readiness Quiz</button>
+  <button class="tab-btn" data-tab="guides" type="button" data-i18n="tabGuides">Guides</button>
+  <button class="tab-btn" data-tab="contacts" type="button" data-i18n="tabContacts">Contacts &amp; Warnings</button>
+  <button class="tab-btn" data-tab="districts" type="button" data-i18n="tabDistricts">Districts</button>
+</nav>
+
+<main>
+  <!-- Calculator -->
+  <section class="tab-panel active" id="tab-calc">
+    <h2 data-i18n="calcTitle">Water &amp; food calculator</h2>
+    <p class="muted" data-i18n="calcIntro">Plan drinking water and dry food for your family. Quantities are planning estimates — adjust for your family's needs.</p>
+    <div class="form-grid">
+      <label>
+        <span data-i18n="peopleLabel">People in your family</span>
+        <input id="peopleInput" type="number" inputmode="numeric" min="1" max="30" value="4">
+      </label>
+      <label>
+        <span data-i18n="daysLabel">Days to prepare for</span>
+        <input id="daysInput" type="number" inputmode="numeric" min="1" max="14" value="3">
+      </label>
+    </div>
+    <button id="calcBtn" class="btn primary" type="button" data-i18n="calcBtn">Calculate</button>
+    <div id="calcErrors" aria-live="polite"></div>
+
+    <div id="calcResults" hidden>
+      <h3 data-i18n="waterTitle">Water you need</h3>
+      <table class="results-table">
+        <tbody>
+          <tr><td data-i18n="drinkingLabel">Drinking water (3 L per person per day)</td><td id="waterDrinking">—</td></tr>
+          <tr><td data-i18n="hygieneLabel">Extra for washing &amp; cleaning</td><td id="waterHygiene">—</td></tr>
+          <tr class="total-row"><td data-i18n="totalLabel">Total water</td><td id="waterTotal">—</td></tr>
+        </tbody>
+      </table>
+      <h3 data-i18n="foodTitle">Dry food you need</h3>
+      <table class="results-table">
+        <tbody id="foodBody"></tbody>
+      </table>
+      <button id="savePlanBtn" class="btn" type="button" data-i18n="savePlan">Save this plan</button>
+      <p id="planMsg" class="muted" aria-live="polite"></p>
+    </div>
+
+    <h3 data-i18n="savedPlans">Saved plans</h3>
+    <div id="plansList"></div>
+
+    <p class="muted" data-i18n="disclaimer">Planning estimates only. Water: 3 L drinking per person per day (WHO emergency planning figure). Food quantities are planning estimates.</p>
+
+    <div class="data-tools">
+      <button id="exportBtn" class="btn" type="button" data-i18n="exportBtn">Export data</button>
+      <label class="btn" for="importFile" data-i18n="importBtn">Import data</label>
+      <input id="importFile" type="file" accept="application/json" hidden>
+      <button id="eraseBtn" class="btn danger" type="button" data-i18n="eraseBtn">Erase all data</button>
+      <p id="dataMsg" class="muted" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- Go-bag -->
+  <section class="tab-panel" id="tab-bag">
+    <h2 data-i18n="bagTitle">Family go-bag checklist</h2>
+    <p class="muted" data-i18n="bagIntro">Tick each item as you pack it. Your progress is saved on this device.</p>
+    <div class="bar"><div class="bar-fill" id="bagBar" style="width:0%"></div></div>
+    <p id="bagPct" class="muted">0/24 · 0%</p>
+    <p id="bagDone" class="success" hidden data-i18n="bagDone">Go-bag complete — well done!</p>
+    <button id="bagResetBtn" class="btn" type="button" data-i18n="bagReset">Reset checklist</button>
+    <div id="bagWrap"></div>
+  </section>
+
+  <!-- Quiz -->
+  <section class="tab-panel" id="tab-quiz">
+    <h2 data-i18n="quizTitle">How ready is your family?</h2>
+    <p class="muted" data-i18n="quizIntro">Answer honestly — 10 questions, 10 marks each. Your best score is saved.</p>
+    <div id="quizWrap"></div>
+    <button id="quizBtn" class="btn primary" type="button" data-i18n="quizBtn">Check my score</button>
+    <div id="quizResult" hidden>
+      <p><strong><span data-i18n="quizScore">Your score</span>: <span id="quizScore">—</span></strong></p>
+      <p id="quizLevel"></p>
+      <div id="quizFixWrap" hidden>
+        <p><strong data-i18n="quizFix">Fix these first:</strong></p>
+        <ul id="quizRecs"></ul>
+      </div>
+    </div>
+    <p class="muted"><span data-i18n="quizBest">Best score</span>: <span id="quizBest">—</span></p>
+  </section>
+
+  <!-- Guides -->
+  <section class="tab-panel" id="tab-guides">
+    <h2 data-i18n="guidesTitle">What to do — before, during, after</h2>
+    <p class="muted" data-i18n="guidesIntro">Tick steps as you do them. Progress is saved on this device.</p>
+    <p id="guidesPct" class="muted">0/21 · 0%</p>
+    <div id="guidesWrap"></div>
+  </section>
+
+  <!-- Contacts & warnings -->
+  <section class="tab-panel" id="tab-contacts">
+    <h2 data-i18n="contactsTitle">Emergency numbers</h2>
+    <p class="muted" data-i18n="contactsIntro">Tap a number to call. All are free from any Bangladeshi mobile.</p>
+    <div id="contactsWrap"></div>
+
+    <h2 data-i18n="levelsTitle">How to read FFWC flood warnings</h2>
+    <p class="muted" data-i18n="levelsIntro">The Flood Forecasting &amp; Warning Centre (BWDB) rates river water levels against the danger level:</p>
+    <table class="results-table wrap">
+      <tbody id="levelsBody"></tbody>
+    </table>
+
+    <h2 data-i18n="trackTitle">Where to check live flood forecasts</h2>
+    <ul>
+      <li><a href="https://www.ffwc.gov.bd/" target="_blank" rel="noopener" data-i18n="trackFfwc">FFWC — Flood Forecasting &amp; Warning Centre (BWDB): ffwc.gov.bd</a></li>
+      <li><a href="https://sites.research.google/floods/" target="_blank" rel="noopener" data-i18n="trackHub">Google Flood Hub — AI flood forecasts using BWDB data.</a></li>
+    </ul>
+    <p class="muted" data-i18n="trackNote">This app is fully offline and shows no live data — check the sites above for today's forecast.</p>
+  </section>
+
+  <!-- Districts -->
+  <section class="tab-panel" id="tab-districts">
+    <h2 data-i18n="distTitle">Districts hit by the July 2024 floods</h2>
+    <p class="muted" data-i18n="distIntro">19 districts were reported flood-affected in July 2024 (The Business Standard, 7 July 2024). This is a historical record, not a live risk map.</p>
+    <input id="distSearch" type="search" data-i18n-ph="distSearch" placeholder="Search district…" aria-label="Search district">
+    <p id="distCount" class="muted">19 districts</p>
+    <div id="distWrap" class="chips"></div>
+  </section>
+</main>
+
+<footer>
+  <p data-i18n="footer">Unofficial preparedness guide — not an official government publication. In an emergency call 999. Verify numbers and warnings with official sources.</p>
+</footer>
+
+<script src="logic.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
